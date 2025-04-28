@@ -3,13 +3,22 @@ library(tidyr)
 require(tidyverse)
 
 #load file
-AF <- fread("../data/Miyazawa_2023_AF_unclean.tsv")
+AF <- fread("../data/Roselli_2025_AF_unclean.txt")
 
 #clean file:
 
+# make p
+AF$P <- exp(AF$`log(P)`)
+
+#delete columns that are not necessary
+print(paste("AF table delete columns:", nrow(AF)))
+AF <- AF %>% select(-MarkerName, -chr, -position_b38, -`log(P)`, -n_events, -mean_impQual)
+print(paste("AF table delete columns(no difference!):", nrow(AF)))
+
+
 #rename columns
 print(paste("AF table rename:", nrow(AF)))
-colnames(AF) <- c("SNP", "chromosome", "bpl", "A1", "A2", "EAF", "beta", "SE", "p_value") 
+colnames(AF) <- c("SNP", "A1", "A2", "MAF", "beta", "SE", "N", "p_value") 
 print(paste("AF table rename(no difference!):", nrow(AF)))
 
 
@@ -43,22 +52,13 @@ not_r_or_empty <- AF$SNP == "" | !grepl("^r", AF$SNP, ignore.case = TRUE)
 if (any(not_r_or_empty)) {
   SNPs <- sum(not_r_or_empty)
   print(SNPs)
+  # delete the once that are empty
+  AF <- AF[!not_r_or_empty, ]
 }
 
 # Delete SNPs that are duplicates
 AF <- AF[!duplicated(AF$SNP), ]
-
-#make MAF
-AF$EAF <- ifelse(AF$EAF > 0.5, 1 - AF$EAF, AF$EAF)
-setnames(AF, old = 'EAF', new = 'MAF')
-
-#calculate effective sample size implied by GWAS summary statistics 
-AF$Neff<-4/((2*AF$MAF*(1-AF$MAF))*AF$SE^2)
-
-#delete columns that are not necessary
-print(paste("AF table delete columns:", nrow(AF)))
-AF <- AF %>% select(-chromosome, -bpl)
-print(paste("AF table delete columns(no difference!):", nrow(AF)))
+print(paste("AF table after delete duplicated:", nrow(AF)))
 
 #save clean file in txt
-write.table(AF, "../clean/Miyazawa_2023_AF_clean.txt", sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+write.table(AF, "../clean/Roselli_2025_AF_clean.txt", sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
