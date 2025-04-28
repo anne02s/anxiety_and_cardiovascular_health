@@ -2,15 +2,6 @@ require(data.table)
 library(tidyr)
 require(tidyverse)
 
-
-
-# during the cleaning we are goining to do these things:
-# *: check of row count does not change during alterations where change is not needed
-# *: delete unnecessary columns
-# *: check is all SNP are single nucleotide #(any(nchar(file$A1) > 1))
-# *: check if all SNP start with rs #(any(!grepl("^r", CAD$SNP, ignore.case = TRUE)))
-# *: make new file with clean data
-
 # load file
 ANX_EUR <- fread("../data/ANX_EUR.txt")
 print(paste("ANX_EUR table:", nrow(ANX_EUR)))
