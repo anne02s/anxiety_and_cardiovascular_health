@@ -20,7 +20,7 @@ DBP_prev <- NA
 PR_prev <- NA
 
 
-rythmic <- data.frame(
+data <- data.frame(
   samp.prevelance = c(HF_prev, AF_prev, brady_dist_inc_prev, brady_dist_rest_prev, brady_pace_prev, brady_snd_inc_prev, brady_snd_rest_prev, BrS_prev, CAD_prev, STR_prev, SBP_prev, DBP_prev, ANX_prev, PR_prev),
   pop.prevelance = c(0.0172, 0.02, 0.038, 0.038, 0.038, 0.038, 0.038, 0.05, 0.063, 0.019, NA, NA, 0.05, NA),
   traitnames <- c("HF", "AF", "BRA_dist_inc", "BRA_dist_rest", "BRA_pacer", "BRA_snd_inc", "BRA_snd_rest", "BrS", "CAD", "STR", "SBP", "DBP", "ANX", "PR"),
@@ -34,16 +34,16 @@ ld <- "eur_w_ld_chr/eur_w_ld_chr"
 wld <- "eur_w_ld_chr/eur_w_ld_chr"
 
 trait.names <- c("HF", "AF", "BRA_dist_inc", "BRA_dist_rest", "BRA_pacer", "BRA_snd_inc", "BRA_snd_rest", "BrS", "CAD", "STR", "SBP", "DBP", "ANX")
-LDSCoutput_ryth <- ldsc(rythmic$trait_path, sample.prev = rythmic$samp.prevelance, population.prev = rythmic$pop.prevelance, ld, wld, rythmic$traitnames)
+LDSCoutput <- ldsc(data$trait_path, sample.prev = data$samp.prevelance, population.prev = data$pop.prevelance, ld, wld, data$traitnames)
 
-save(LDSCoutput_ryth, file = "LDSC_output_rythmic.Rdata")
-load("LDSC_output_rythmic.Rdata")
+save(LDSCoutput, file = "LDSC_output.Rdata")
+
 #heatmap
 library(ggplot2)
 library(reshape2)
-mat <- cov2cor(LDSCoutput_ryth$S)
+mat <- cov2cor(LDSCoutput$S)
 data_melted <- as.data.frame(as.table(mat))
-data_melted$Var1 <- rythmic$traitnames
+data_melted$Var1 <- data$traitnames
 data_melted$Var1 <- factor(data_melted$Var1, levels = unique(data_melted$Var1))
 data_melted$Var2 <- factor(data_melted$Var2, levels = unique(data_melted$Var2))
 # Create a heatmap using ggplot2
@@ -62,17 +62,17 @@ ggplot(data_melted, aes(Var1, Var2, fill = Freq)) +
 
 
 #calculating standard error: 
-n<-nrow(LDSCoutput_ryth$S)
+n<-nrow(LDSCoutput$S)
 SE<-matrix(0, n, n)
-SE[lower.tri(SE,diag=TRUE)] <-sqrt(diag(LDSCoutput_ryth$V))
+SE[lower.tri(SE,diag=TRUE)] <-sqrt(diag(LDSCoutput$V))
 
 # Calculate z-scores
-z <- LDSCoutput_ryth$S / SE
+z <- LDSCoutput$S / SE
 
 #heatmap
 z[z == Inf] <- NA
 Z <- melt(z)
-Z$Var1 <- rythmic$traitnames
+Z$Var1 <- data$traitnames
 Z$Var1 <- factor(Z$Var1, levels = unique(Z$Var1))
 Z$Var2 <- factor(Z$Var2, levels = unique(Z$Var2))
 # Clean up your data first
@@ -97,7 +97,7 @@ ggplot(Z_clean, aes(Var1, Var2, fill = value)) +
 # Calculate two-tailed p-values
 p <- 2 * (1 - pnorm(abs(z)))
 P <- melt(p)
-P$Var1 <- rythmic$traitnames
+P$Var1 <- data$traitnames
 P$Var1 <- factor(P$Var1, levels = unique(P$Var1))
 P$Var2 <- factor(P$Var2, levels = unique(P$Var2))
 # Create a heatmap using ggplot2
