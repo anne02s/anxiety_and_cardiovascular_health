@@ -1,0 +1,25 @@
+require(GenomicSEM)
+require(data.table)
+require(tidyverse)
+library(tidyr)
+
+load("LDSCoutput.Rdata")
+load("PSYCH_neff.Rdata")
+
+PSYCH_factor <- commonfactorGWAS(covstruc = LDSCoutput, SNPs = PSYCH_sumstats)
+
+#restrict to MAF >= 10%
+PSYCH_factor2<-subset(PSYCH_factor, PSYCH_factor$MAF >= .1)
+#calculate expected sample size (N_hat)
+N_hat<-mean(1/((2*PSYCH_factor2$MAF*(1-PSYCH_factor2$MAF))*PSYCH_factor2$se_c^2))
+
+N_hat <- 1111024 # replace with your actual estimate
+
+PSYCH_factor2$SE <- 1 / sqrt(N_hat * 2 * PSYCH_factor2$MAF * (1 - PSYCH_factor2$MAF))
+PSYCH_factor2$BETA <- PSYCH_factor2$Z_Estimate * PSYCH_factor2$SE
+
+final_result <- PSYCH_factor2 %>%
+  select(SNP, CHR, BP, A1, A2, Pval_Estimate, SE, BETA)
+
+write.table(final_result, "commonfactor_output.txt", sep = "\t", quote = FALSE, row.names = FALSE)
+
