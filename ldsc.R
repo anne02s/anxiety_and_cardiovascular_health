@@ -5,7 +5,6 @@ library(tidyr)
 
 HF_prev <- 0.08167744
 AF_prev <- 166322/1480272
-#AF_prev <- 60620/1031836
 brady_dist_inc_prev <- 28359/812226
 brady_dist_rest_prev <- 7834/1112609
 brady_snd_inc_prev <- 8891/1117885
@@ -15,16 +14,16 @@ BrS_prev <- 2820/12821
 ANX_prev <- 0.07981
 CAD_prev <- 120788/980319
 STR_prev <- 73652/1308460
-SBP_prev <- NA
-DBP_prev <- NA
-PR_prev <- NA
+HYP_prev <- 0.316
+QRS_prev <- NA
+QT_prev <- NA
 
 
 data <- data.frame(
-  samp.prevelance = c(HF_prev, AF_prev, brady_dist_inc_prev, brady_dist_rest_prev, brady_pace_prev, brady_snd_inc_prev, brady_snd_rest_prev, BrS_prev, CAD_prev, STR_prev, SBP_prev, DBP_prev, ANX_prev, PR_prev),
-  pop.prevelance = c(0.0172, 0.02, 0.038, 0.038, 0.038, 0.038, 0.038, 0.05, 0.063, 0.019, NA, NA, 0.05, NA),
-  traitnames <- c("HF", "AF", "BRA_dist_inc", "BRA_dist_rest", "BRA_pacer", "BRA_snd_inc", "BRA_snd_rest", "BrS", "CAD", "STR", "SBP", "DBP", "ANX", "PR"),
-  trait_path <- c("munge/HF.sumstats.gz", "munge/AF.sumstats.gz", "munge/brady_dist_inc.sumstats.gz", "munge/brady_dist_rest.sumstats.gz", "munge/brady_pacer.sumstats.gz", "munge/brady_snd_inc.sumstats.gz", "munge/brady_snd_rest.sumstats.gz","munge/BrS.sumstats.gz", "munge/CAD.sumstats.gz", "munge/STR.sumstats.gz", "munge/SBP.sumstats.gz", "munge/DBP.sumstats.gz", "munge/ANX.sumstats.gz", "munge/PR.sumstats.gz")
+  samp.prevelance = c(HF_prev, AF_prev, brady_dist_inc_prev, brady_dist_rest_prev, brady_pace_prev, brady_snd_inc_prev, brady_snd_rest_prev, BrS_prev, CAD_prev, STR_prev, ANX_prev, HYP_prev, QRS_prev, QT_prev),
+  pop.prevelance = c(0.017, 0.02, 0.038, 0.038, 0.038, 0.038, 0.038, 0.0001, 0.036, 0.092, 0.05, 0.22, NA, NA),
+  traitnames <- c("HF", "AF", "BRA_dist_inc", "BRA_dist_rest", "BRA_pacer", "BRA_snd_inc", "BRA_snd_rest", "BrS", "CAD", "STR", "ANX","HYP", "QRS". "QT"),
+  trait_path <- c("munge/HF.sumstats.gz", "munge/AF.sumstats.gz", "munge/brady_dist_inc.sumstats.gz", "munge/brady_dist_rest.sumstats.gz", "munge/brady_pacer.sumstats.gz", "munge/brady_snd_inc.sumstats.gz", "munge/brady_snd_rest.sumstats.gz","munge/BrS.sumstats.gz", "munge/CAD.sumstats.gz", "munge/STR.sumstats.gz", "munge/ANX.sumstats.gz", "munge/HYP.sumstats.gz", "munge/QRS.sumstats.gz", "munge/QT.sumstats.gz")
   
 )
 
@@ -33,7 +32,6 @@ data <- data.frame(
 ld <- "eur_w_ld_chr/eur_w_ld_chr"
 wld <- "eur_w_ld_chr/eur_w_ld_chr"
 
-trait.names <- c("HF", "AF", "BRA_dist_inc", "BRA_dist_rest", "BRA_pacer", "BRA_snd_inc", "BRA_snd_rest", "BrS", "CAD", "STR", "SBP", "DBP", "ANX")
 LDSCoutput <- ldsc(data$trait_path, sample.prev = data$samp.prevelance, population.prev = data$pop.prevelance, ld, wld, data$traitnames)
 
 save(LDSCoutput, file = "LDSC_output.Rdata")
