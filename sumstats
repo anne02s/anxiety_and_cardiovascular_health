@@ -1,0 +1,45 @@
+require(GenomicSEM)
+require(data.table)
+require(tidyverse)
+library(tidyr)
+
+data <- data.frame(
+  samp.prevelance = c(0.08167744, 0.219, 0.123, 0.056, 0.316, 0.07981),
+  pop.prevelance = c(0.017, 0.0001, 0.036, 0.092,0.22, 0.05),
+  traitnames = c("HF", "BrS", "CAD", "STR", "HYP", "ANX"),
+  trait_path = c("munge/HF.sumstats.gz", "munge/BrS.sumstats.gz", "munge/CAD.sumstats.gz", "munge/STR.sumstats.gz", "munge/HYP_2019.sumstats", "munge/ANX.sumstats.gz"),
+  files = c("clean/Henry_2025_HF_EUR_clean.txt",
+            "clean/Barc_2022_BrS_clean.txt",
+            "clean/aragam_2022_CAD_clean.txt",
+            "clean/mishra_2022_stroke_clean.txt",
+            "clean/Zhu_2019_HYP_clean.txt",
+            "clean/Friligkou_2024_ANX_EUR_clean.txt")
+)
+
+
+data$neff <- with(data, 4 * n_cases * n_control / (n_cases + n_control))
+
+ref= "reference.1000G.maf.0.005.txt"
+se.logit=c(T,T,T,T,T,T)
+Hail=c(F,F,F,F,F,F)
+info.filter=.6
+maf.filter=0.01
+OLS=NULL
+N=data$neff
+betas=NULL
+
+
+PSYCH_sumstats <-sumstats(files=data$files,
+                          ref=ref,
+                          trait.names=data$traitnames,
+                          se.logit=se.logit,
+                          OLS=NULL,
+                          linprob=Hail,
+                          N=N,
+                          betas=NULL,
+                          info.filter=.6,
+                          maf.filter=0.01,
+                          keep.indel=FALSE,
+                          parallel=FALSE,
+                          cores=NULL)
+save(PSYCH_sumstats, file = "PSYCH_neff.Rdata")
